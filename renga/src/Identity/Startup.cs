@@ -12,7 +12,10 @@ using IdentityServer4.Test;
 using IdentityModel;
 using System.Security.Claims;
 using IdentityServer4;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
+using IdentityServer4.Hosting;
+using IdentityServer4.Quickstart.UI;
 
 namespace Identity
 {
@@ -43,12 +46,21 @@ namespace Identity
 
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
+
+            var policy = new CorsPolicy();
+            policy.Headers.Add("*");
+            policy.Methods.Add("*");
+            policy.Origins.Add("*");
+
+            services.AddCors(x => x.AddPolicy("corsPolicy", policy));
+
             services.AddIdentityServer()
-.AddInMemoryClients(Clients.Get())
-.AddInMemoryIdentityResources(Resources.GetIdentityResources())
-.AddInMemoryApiResources(Resources.GetApiResources())
-.AddTestUsers(Users.Get())
-.AddTemporarySigningCredential();
+                .AddInMemoryClients(Clients.Get())
+                .AddInMemoryIdentityResources(Resources.GetIdentityResources())
+                .AddInMemoryApiResources(Resources.GetApiResources())
+                .AddTestUsers(TestUsers.Users)
+                .AddTemporarySigningCredential();
+
             services.AddMvc();
         }
 
@@ -57,6 +69,9 @@ namespace Identity
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            app.ConfigureCors();
+            app.UseCors("corsPolicy");
+
             app.UseIdentityServer();
             app.UseApplicationInsightsRequestTelemetry();
 
@@ -125,8 +140,8 @@ namespace Identity
         };
             clients.Add(new Client
             {
-                ClientId = "openIdConnectClient",
-                ClientName = "Example Implicit Client Application",
+                ClientId = "UI",
+                ClientName = "Rengas UI",
                 AllowedGrantTypes = GrantTypes.Implicit,
                 AllowedScopes = new List<string>
                                     {
@@ -136,8 +151,11 @@ namespace Identity
                                         "role",
                                         "customAPI.write"
                                     },
+                AllowAccessTokensViaBrowser = true,
+                AlwaysIncludeUserClaimsInIdToken = true,
                 RedirectUris = new List<string> { "http://localhost:3000/signin-oidc" },
-                PostLogoutRedirectUris = new List<string> { "http://localhost:3000" }
+                PostLogoutRedirectUris = new List<string> { "http://localhost:3000" },
+                AllowedCorsOrigins = new List<string>() { "http://localhost:3000" }
             });
             return clients;
         }
@@ -153,7 +171,7 @@ namespace Identity
             new IdentityResources.Email(),
             new IdentityResource {
                 Name = "role",
-                UserClaims = new List<string> {"role"}
+                UserClaims = new List<string> { "role"}
             }
         };
         }

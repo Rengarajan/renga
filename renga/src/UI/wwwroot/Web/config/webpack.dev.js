@@ -27,7 +27,7 @@ const METADATA = webpackMerge(commonConfig({env: ENV}).metadata, {
   port: PORT,
   ENV: ENV,
   HMR: HMR,
-  OIDC_URL: 'http://localhost:57929/account/login?returnUrl=%2Fgrants'
+  OIDC_URL: 'http://localhost:4000'
 });
 
 

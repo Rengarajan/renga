@@ -26,11 +26,13 @@ import { APP_RESOLVER_PROVIDERS } from './app.resolver';
 import { AppState, InternalStateType } from './app.service';
 import { HomeComponent } from './home';
 import { AboutComponent } from './about';
+import { HeaderComponent } from './header';
 import { NoContentComponent } from './no-content';
 import { XLargeDirective } from './home/x-large';
 
 import '../styles/styles.scss';
 import '../styles/headings.css';
+import { SecurityModule } from  './security';
 
 // Application wide providers
 const APP_PROVIDERS = [
@@ -51,6 +53,7 @@ type StoreType = {
   bootstrap: [ AppComponent ],
   declarations: [
     AppComponent,
+    HeaderComponent,
     AboutComponent,
     HomeComponent,
     NoContentComponent,
@@ -63,7 +66,8 @@ type StoreType = {
     BrowserModule,
     FormsModule,
     HttpModule,
-    RouterModule.forRoot(ROUTES, { useHash: true, preloadingStrategy: PreloadAllModules })
+    SecurityModule,
+    RouterModule.forRoot(ROUTES, { useHash: false, preloadingStrategy: PreloadAllModules })
   ],
   /**
    * Expose our Services and Providers into Angular's dependency injection.

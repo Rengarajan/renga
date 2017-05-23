@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
   styles: [`
   `],
   template: `
+    <app-header></app-header>
     <h1>About</h1>
     <div>
       For hot module reloading run
